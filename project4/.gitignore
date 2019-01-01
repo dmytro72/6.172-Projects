@@ -1,0 +1,14 @@
+player/*.o
+player/leiserchess
+player/history
+*.class
+*.jar
+.__afs*
+*.swp
+*.d
+*.pgn
+tags
+BayesElo/bayeselo
+pgnstats/pgnstats
+pgnstats/pgnstats.o
+

@@ -1,0 +1,55 @@
+﻿nhr, alhamzah
+Project 2 Beta Writeup
+  
+
+Design Overview
+
+
+Our main area of improvement came from designing a quadtree struct as suggested in the handout, and storing all of the lines/parallelograms inside nodes. In each quadtree struct, we store four quadtree children, a linked list of dividable lines/parallelograms, a linked list of undividable lines/parallelograms, the max tree depth, and the max number of lines. Initially, complications arose from figuring out how to make the quadtrees at each timestep and deleting them afterwards. Neither of us have worked with C extensively before, so we ran into some issues with pointers which we got stuck on for a long time. This caused inconsistencies in our results, answers that were different from the initial implementation, but were significantly faster, letting us know we were on the right track. After fixing the bugs with pointers, we were able to match the answer of the initial implementation while keeping our speed improvements.
+
+
+After creating the quadtree, we had to change how we check which lines intersect. The way we detect intersections in the quadtree utilizes a depth first search starting from the root with a linked list of active_nodes, where each node contains the line and its associated parallelogram. We take these nodes, which represent ancestors of the current quadtree level, and check whether they intersect with the nodes at the current quadtree level. We then add the nodes at the current level to active_nodes, and recurse to each of the children.
+
+
+After getting the quadtree to work, we tried simple further optimizations. We stored the line lengths in the collisionWorld object, which resulted in a small improvement, around 0.2s. 
+We then tried updating a single tree at every timestep with the new line positions instead of destroying and rebuilding the quadtree repeatedly. We thought we could do this by updating parallelograms based on the updated line positions in the quadtree, then finding each parallelogram’s place in the tree by checking if it fits in its current quadrant. Otherwise, we go up the tree until we find a node that fully contains the parallelogram and then insert it there. Unfortunately, we were running short of time and focused our priorities elsewhere.
+
+
+Using valgrind, we were able to see that we were failing to free all of the memory that we allocated for each of our structs, resulting in over 100,000 bytes of lost memory. We were able to correct most of these issues and reduce that to only 2,000 bytes of lost memory before looking for larger impact changes.
+
+
+After that we tried using Cilk. We first tried to parallelize the collision detection in CollisionWorld_detectIntersection with the quad tree. We tried using the similar approach to homework4 with hyperobjects and reducers, but we ran into issues in implementing reducers when we append a node to intersectionEventList after detecting a collision. We couldn’t detect any races using CILKSAN, and were lost as to why this implementation resulted in incorrect answers.
+
+
+Another approach we tried was to divide the intersecting linked lists into N parts, and spawn threads for each smaller list manually so that each thread appends to an independent intersectionEventList. We could then combine these independent lists to a result list to give us our final answer. However, we couldn’t quite resolve this solution either. 
+
+
+In the end, our beta submission unfortunately didn’t contain any parallelism. Implementing parallelism throughout the code will be key to taking our performance to the next level for the final submission.
+
+
+Further Optimizations
+
+
+* Parallelize the collision detection
+* Updating the quadtree instead of destroying it after each frame
+* Improve other parts of serial intersection detection code that we didn’t inspect very closely
+
+
+Expected Performance
+
+
+Number of frames = 4000
+Input file path is: input/mit.in
+---- RESULTS ——
+Elapsed execution time: 12.854943s
+---- END RESULTS ----
+
+
+
+
+
+
+Extra
+
+
+Debugging this code seemed to be particularly difficult. There wasn’t any easy way to visualize what was happening with our quadtree divisions, or where the lines/parallelograms were in space and where they corresponded to directly in the quadtree. As a result, when bugs appeared, there wasn’t an obvious place to look first most of the time. On the other hand, our skills with gdb have increased quite a bit!

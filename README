@@ -1,0 +1,11 @@
+Dump of my projects for MIT 6.172 Performance Engineering for Software Systems which I took in Fall 2018.
+
+All the projects are in C and were done in a team of two except the last one which was done in a team of four.
+
+Project 1: using bithacks to shift n array of bits.
+
+Project 2: open ended collision detection program.
+
+Project 3: implementing a memory allocator.
+
+Project 4: optimizing an AI playing a customized version of Khet.

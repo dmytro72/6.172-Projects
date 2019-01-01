@@ -1,0 +1,9 @@
+move g4L
+move b3L
+move g4h5
+move c5R
+move g3R
+move b4R
+setoption name reset_rng value 1
+go depth 8
+quit
